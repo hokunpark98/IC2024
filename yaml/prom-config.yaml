@@ -1,0 +1,9 @@
+# prom-config.yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kubernetes-nodes'
+    static_configs:
+    - targets: ['localhost:9100']
+

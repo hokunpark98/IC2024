@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: diskio-150-4
+spec:         
+  containers:
+  - name: diskio150
+    image: "docker.io/hokunpark/kube:diskIO150"             
+    imagePullPolicy: Always
+    resources:
+     requests: 
+       cpu: 500m
+       memory: 500Mi
+     limits:
+       cpu: 500m
+       memory: 500Mi
+    volumeMounts:
+    - mountPath: "/home/save"
+      name: vol
+    securityContext:
+      runAsUser: 0
+    command: ["/bin/sh"]
+    args: ["-c", "mkdir -p /home/save/diskio-150-4; cd /home/save/diskio-150-4; python3 /home/main.py"]
+
+  volumes:
+  - name: vol
+    persistentVolumeClaim:
+      claimName: pvc
+  nodeSelector:
+     key: worker1      

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: matrix-2048-1
+spec:         
+  containers:
+  - name: matrix2048
+    image: "docker.io/hokunpark/kube:matrix2048"             
+    imagePullPolicy: Always
+    resources:
+     requests: 
+       cpu: 500m
+     limits:
+       cpu: 500m
+    volumeMounts:
+    - mountPath: "/home/save"
+      name: vol
+
+  volumes:
+  - name: vol
+    persistentVolumeClaim:
+      claimName: pvc
+    

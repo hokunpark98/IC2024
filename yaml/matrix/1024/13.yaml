@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: matrix-2048-13
+spec:         
+  containers:
+  - name: matrix
+    image: "docker.io/hokunpark/kube:matrix2048"             
+    imagePullPolicy: Always
+    resources:
+     requests: 
+       cpu: 500m
+       memory: 500Mi
+     limits:
+       cpu: 500m
+       memory: 500Mi
+    volumeMounts:
+    - mountPath: "/home/save"
+      name: vol
+    securityContext:
+      runAsUser: 0
+    command: ["/bin/sh"]
+    args: ["-c", "mkdir -p /home/save/matrix-2048-13; cd /home/save/matrix-2048-13; python3 /home/matrix.py"]
+
+  volumes:
+  - name: vol
+    persistentVolumeClaim:
+      claimName: hokun-pvc
+  nodeSelector:
+     nodeNM: worker2      

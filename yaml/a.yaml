@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: edf9366ebb91141164fe92ae3b4a6d8288dc25d224da1120382ed9f2f932f98c
+    cni.projectcalico.org/podIP: 172.27.205.155/32
+    cni.projectcalico.org/podIPs: 172.27.205.155/32
+  creationTimestamp: "2023-10-27T10:31:02Z"
+  generateName: prometheus-595485c656-
+  labels:
+    app: prometheus
+    pod-template-hash: 595485c656
+  name: prometheus-595485c656-tb9tf
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: prometheus-595485c656
+    uid: 0bca11c1-e859-4a0f-ba79-21003ab82aed
+  resourceVersion: "38619252"
+  uid: 5db66e3b-ca5b-49be-9b28-4e96dd838d76
+spec:
+  containers:
+  - args:
+    - --config.file=/etc/prometheus/prometheus.yml
+    image: prom/prometheus:v2.30.0
+    imagePullPolicy: IfNotPresent
+    name: prometheus
+    ports:
+    - containerPort: 9100
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /etc/prometheus/prometheus.yml
+      name: config-volume
+      subPath: prometheus.yml
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-zls82
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: master
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 420
+      name: prom-config
+    name: config-volume
+  - name: kube-api-access-zls82
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-27T10:31:02Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-27T10:31:03Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-27T10:31:03Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-10-27T10:31:02Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://0cb913ced746c64e9c0561717b804f1e80bb069201f524f00ae5d6aef22b129a
+    image: docker.io/prom/prometheus:v2.30.0
+    imageID: docker.io/prom/prometheus@sha256:58fb03aafb142d58cb03965a63a79e9233180d95ee23ca2a76f081b38d286954
+    lastState: {}
+    name: prometheus
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-10-27T10:31:03Z"
+  hostIP: 192.168.0.3
+  phase: Running
+  podIP: 172.27.205.155
+  podIPs:
+  - ip: 172.27.205.155
+  qosClass: BestEffort
+  startTime: "2023-10-27T10:31:02Z"

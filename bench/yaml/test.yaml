@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: kube-bench-client1
+  namespace: hokun
+  labels:
+    app: kube-bench-client1  
+    version: v1 
+spec:         
+  containers:
+  - name: client
+    image: "docker.io/hokunpark/bench:imageDownloadClient"             
+    imagePullPolicy: Always
+    resources:
+     requests:
+       cpu: 1
+       memory: 2000Mi
+     limits:
+       cpu: 1
+       memory: 2000Mi
+    securityContext:
+      runAsUser: 0
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 36000"]
+
+    volumeMounts:
+        - name: kube-bench-client-vol
+          mountPath: /home/dnclab/hokun/kube
+
+  volumes:
+    - name: kube-bench-client-vol
+      emptyDir:
+        sizeLimit: 5Gi  
+
+  nodeSelector:
+     key: worker2

@@ -1,0 +1,247 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: a
+  namespace: hokun
+  labels:
+    app: a
+    group: kube-bench
+    version: v1
+spec:
+  containers:
+  - name: client
+    image: "docker.io/hokunpark/bench:downloadA"
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 2
+        memory: 2Gi
+      limits:
+        cpu: 2
+        memory: 2Gi
+    command: ["/bin/sh"] 
+    args: ["-c", "python3 /home/A.py"]
+    volumeMounts:
+      - name: kube-bench-server-vol
+        mountPath: /home/dnclab/hokun/kube
+  volumes:
+    - name: kube-bench-server-vol
+      emptyDir:
+        sizeLimit: 5Gi
+  nodeSelector:
+     key: worker1    
+---
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: b
+  namespace: hokun
+  labels:
+    app: b
+    group: kube-bench
+    version: v1
+spec:
+  containers:
+  - name: client
+    image: "docker.io/hokunpark/bench:downloadB"
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 2
+        memory: 2Gi
+      limits:
+        cpu: 2
+        memory: 2Gi
+    
+      
+    command: ["/bin/sh"] 
+    args: ["-c", "python3 /home/B.py"]
+    volumeMounts:
+        - name: kube-bench-server-vol
+          mountPath: /home/dnclab/hokun/kube
+  volumes:
+    - name: kube-bench-server-vol
+      emptyDir:
+        sizeLimit: 5Gi
+  nodeSelector:
+     key: worker1    
+---
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: c
+  namespace: hokun
+  labels:
+    app: c
+    group: kube-bench
+    version: v1
+spec:
+  containers:
+  - name: client
+    image: "docker.io/hokunpark/bench:downloadC"
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 2
+        memory: 2Gi
+      limits:
+        cpu: 2
+        memory: 2Gi
+    
+      
+    command: ["/bin/sh"] 
+    args: ["-c", "python3 /home/C.py"]
+    volumeMounts:
+        - name: kube-bench-server-vol
+          mountPath: /home/dnclab/hokun/kube
+  volumes:
+    - name: kube-bench-server-vol
+      emptyDir:
+        sizeLimit: 5Gi  
+  nodeSelector:
+     key: worker1    
+---
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: d
+  namespace: hokun
+  labels:
+    app: d
+    group: kube-bench
+    version: v1
+spec:
+  containers:
+  - name: client
+    image: "docker.io/hokunpark/bench:downloadD"
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 2
+        memory: 2Gi
+      limits:
+        cpu: 2
+        memory: 2Gi  
+    command: ["/bin/sh"] 
+    args: ["-c", "python3 /home/D.py"]
+    volumeMounts:
+        - name: kube-bench-server-vol
+          mountPath: /home/dnclab/hokun/kube
+  volumes:
+    - name: kube-bench-server-vol
+      emptyDir:
+        sizeLimit: 5Gi 
+  nodeSelector:
+     key: worker1    
+     
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-bench-server-service
+  namespace: hokun
+spec:
+  selector:
+    group: kube-bench
+  ports:
+    - name: porta
+      protocol: TCP
+      port: 15015
+      targetPort: 15015
+    - name: portb
+      protocol: TCP
+      port: 15016
+      targetPort: 15016
+    - name: portc
+      protocol: TCP
+      port: 15017
+      targetPort: 15017
+    - name: portd
+      protocol: TCP
+      port: 15018
+      targetPort: 15018
+    
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: a-dr
+  namespace: hokun
+spec:
+  host: kube-bench-server-service
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: a-vs
+  namespace: hokun
+spec:
+  hosts:
+  - kube-bench-server-service
+  http:
+  - route:
+    - destination:
+        host: kube-bench-server-service
+        subset: v1
+
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: envoy-acess-logs-server
+  namespace: hokun
+spec:
+  selector:
+    matchLabels:
+      app: a
+  accessLogging:
+  - providers:
+    - name: enable-targeted-envoy-acess-logs
+
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: envoy-acess-logs-client
+  namespace: hokun
+spec:
+  selector:
+    matchLabels:
+      app: b  # b, c, d에 대한 로그를 한 개의 Telemetry 구성에서 처리하려면 각 앱을 별도의 라인으로 추가
+  accessLogging:
+  - providers:
+    - name: enable-targeted-envoy-acess-logs
+
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: envoy-acess-logs-client-c
+  namespace: hokun
+spec:
+  selector:
+    matchLabels:
+      app: c
+  accessLogging:
+  - providers:
+    - name: enable-targeted-envoy-acess-logs
+
+---
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: envoy-acess-logs-client-d
+  namespace: hokun
+spec:
+  selector:
+    matchLabels:
+      app: d
+  accessLogging:
+  - providers:
+    - name: enable-targeted-envoy-acess-logs

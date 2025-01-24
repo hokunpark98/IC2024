@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: memory-bench
+  namespace: hokun
+  labels:
+    app: memory-bench 
+    version: v1
+
+spec:         
+  containers:
+  - name: server
+    image: "docker.io/hokunpark/bench:memory1GB"             
+    imagePullPolicy: Always
+    resources:
+     requests:
+       cpu: 4
+       memory: 2Gi
+     limits:
+       cpu: 4
+       memory: 2Gi
+    securityContext:
+      runAsUser: 0     

@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: matrix-512-6
+spec:         
+  containers:
+  - name: matrix
+    image: "docker.io/hokunpark/kube:matrix512"             
+    imagePullPolicy: Never
+    resources:
+     requests: 
+       cpu: 1000m
+       memory: 2Gi
+     limits:
+       cpu: 1000m
+       memory: 2Gi
+    volumeMounts:
+    - mountPath: "/home/save"
+      name: vol
+    securityContext:
+      runAsUser: 0
+    command: ["/bin/sh"]
+    args: ["sleep 3600"]
+
+  volumes:
+  - name: vol
+    persistentVolumeClaim:
+      claimName: hokun-pvc
+  nodeSelector:
+     nodeNM: worker2  

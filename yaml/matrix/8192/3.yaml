@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: m-8192-3
+spec:         
+  containers:
+  - name: matrix
+    image: "docker.io/hokunpark/kube:m8192_3"             
+    imagePullPolicy: Always
+    resources:
+     requests: 
+       cpu: 1000m
+       memory: 2Gi
+     limits:
+       cpu: 1000m
+       memory: 2Gi
+    volumeMounts:
+    - mountPath: "/home/save"
+      name: vol
+    securityContext:
+      runAsUser: 0
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 3600"]
+
+  volumes:
+  - name: vol
+    persistentVolumeClaim:
+      claimName: hokun-pvc
+  nodeSelector:
+     nodeNM: worker2  

@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: blackbox-exporter
+  namespace: istio-system
+
+spec:
+  jobLabel: blackbox
+  endpoints:
+  - port: http
+    path: /probe
+    scheme: http
+    params:
+      module: [icmp]
+  namespaceSelector:
+    matchNames:
+    - istio-system
+  selector:
+    matchLabels:
+      app: blackbox-exporter

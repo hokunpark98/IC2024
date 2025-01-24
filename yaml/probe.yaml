@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: worker-node-icmp-probe
+  namespace: istio-system
+spec:
+  jobName: icmp-probe
+  prober:
+    url: blackbox-exporter.istio-system.svc.cluster.local:9115 
+    scheme: http
+    path: /probe
+  targets:
+    staticConfig:
+      static:
+      - 192.168.0.4
+      - 192.168.0.5
+      - 192.168.0.6
+  module: icmp
+  interval: 15s
